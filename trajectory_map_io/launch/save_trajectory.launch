@@ -1,10 +1,18 @@
 <launch>
 
     <node pkg="trajectory_saver" type="save_trajectory_node" name="save_trajectory_node" output="screen">
+
+        <!-- save trajectory and map  -->
         <param name="save_trajectory_en" type="int" value="1"/>
         <param name="save_map_en" type="int" value="1"/>
-        <param name="trajectory_save_file" type="string" value="/home/larrydong/trajectory.txt"/>
-        <param name="map_save_file" type="string" value="/home/larrydong/map.pcd"/>
+
+        <!-- path to save trajectory and map -->
+        <param name="trajectory_save_file" type="string" value="/home/larrydong/slam-trajectory.txt"/>
+        <param name="map_save_file" type="string" value="/home/larrydong/slam-map.pcd"/>
+
+        <!-- map downsampling size -->
+        <param name="map_downsample_size" type="double" value="0.5"/>
+
     </node>
 
 </launch>
