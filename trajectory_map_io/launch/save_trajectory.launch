@@ -1,0 +1,10 @@
+<launch>
+
+    <node pkg="trajectory_saver" type="save_trajectory_node" name="save_trajectory_node" output="screen">
+        <param name="save_trajectory_en" type="int" value="1"/>
+        <param name="save_map_en" type="int" value="1"/>
+        <param name="trajectory_save_file" type="string" value="/home/larrydong/trajectory.txt"/>
+        <param name="map_save_file" type="string" value="/home/larrydong/map.pcd"/>
+    </node>
+
+</launch>
