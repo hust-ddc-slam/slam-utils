@@ -63,18 +63,19 @@ void commandHandler(const std_msgs::String s){
         if(gb_save_trajectory){ 
             g_odom_mutex.lock();
             ofstream out(g_trajectory_file, ios::out);
-            ROS_INFO("--> Start to save trajectory");
-            out << "# ts, qw, qx, qy, qz, tx, ty, tz " << endl;
+            ROS_INFO("--> Start to save trajectory (TUM format)");
+            out << "# timestampe x y z qx qy qz qw" << endl;
             for(auto odom : gv_odoms){
                 geometry_msgs::Pose p = odom.pose.pose;
-                out << odom.header.stamp.toSec() << ", "
-                    << p.orientation.w << ", "
-                    << p.orientation.x << ", "
-                    << p.orientation.y << ", "
-                    << p.orientation.z << ", "
-                    << p.position.x << ", "
-                    << p.position.y << ", "
-                    << p.position.z << endl;
+                out << std::setprecision(15) << odom.header.stamp.toSec() << " "
+                    << std::setprecision(8)
+                    << p.position.x << " "
+                    << p.position.y << " "
+                    << p.position.z << " "
+                    << p.orientation.x << " "
+                    << p.orientation.y << " "
+                    << p.orientation.z << " "
+                    << p.orientation.w << endl;
             }
             g_odom_mutex.unlock();
             ROS_INFO_STREAM("<-- Saved " << gv_odoms.size() <<" positions into file: " << g_trajectory_file);

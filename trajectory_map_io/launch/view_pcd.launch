@@ -1,0 +1,10 @@
+<launch>
+
+    <node pkg="trajectory_saver" type="view_pcd" name="view_pcd" output="screen">
+
+        <!-- save trajectory and map  -->
+        <param name="pcd_filename" type="string" value="/home/larrydong/slam-map.pcd"/>
+
+    </node>
+
+</launch>
