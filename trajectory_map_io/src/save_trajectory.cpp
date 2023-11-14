@@ -32,11 +32,13 @@ std::vector<PointCloudType> gv_registered_clouds;
 std::vector<nav_msgs::Odometry> gv_odoms;
 
 // trajectory and map output file.
-std::string g_trajectory_file("/home/larrydong/trajectory.txt");
-std::string g_map_file("/home/larrydong/map.ply");
+std::string g_output_folder("/home/larrydong/");
+std::string g_method_name("default-method");
+std::string g_map_type("pcd");      // pcd or ply
 
 // map save downsampling size
 float g_map_ds_size(0.1);           // map downsampling size
+
 
 // save each lidar's scan
 void registeredCloudHandler(const sensor_msgs::PointCloud2ConstPtr &msg){
@@ -62,7 +64,8 @@ void commandHandler(const std_msgs::String s){
 
         if(gb_save_trajectory){ 
             g_odom_mutex.lock();
-            ofstream out(g_trajectory_file, ios::out);
+            const string trajectory_file(g_output_folder + g_method_name + ".txt");
+            ofstream out(trajectory_file, ios::out);
             ROS_INFO("--> Start to save trajectory (TUM format)");
             out << "# timestampe x y z qx qy qz qw" << endl;
             for(auto odom : gv_odoms){
@@ -78,7 +81,7 @@ void commandHandler(const std_msgs::String s){
                     << p.orientation.w << endl;
             }
             g_odom_mutex.unlock();
-            ROS_INFO_STREAM("<-- Saved " << gv_odoms.size() <<" positions into file: " << g_trajectory_file);
+            ROS_INFO_STREAM("<-- Saved " << gv_odoms.size() <<" positions into file: " << trajectory_file);
         }
 
         if(gb_save_map){
@@ -102,19 +105,20 @@ void commandHandler(const std_msgs::String s){
             g_map_mutex.unlock();
 
             // save to ply/pcd file. Automatically check the file format and save.
-            string map_file_type = g_map_file.substr(g_map_file.size() - 3, 3); // get output file type.
-            if(map_file_type == "ply")
-                pcl::io::savePLYFile(g_map_file, *full_map);
-            else if(map_file_type == "pcd")
-                pcl::io::savePCDFile(g_map_file, *full_map);
+            string map_file(g_output_folder + g_method_name + "." + g_map_type);
+            if(g_map_type == "ply")
+                pcl::io::savePLYFile(map_file, *full_map);
+            else if(g_map_type == "pcd")
+                pcl::io::savePCDFile(map_file, *full_map);
             else
                 ROS_ERROR_STREAM("Unexpected map save format.");
-            ROS_INFO_STREAM("--> Got " << lidar_scan_number<<" lidar-scan and saved " << full_map->size() << " points into file: " << g_map_file);
+            ROS_INFO_STREAM("<-- Got " << lidar_scan_number<<" lidar-scan and saved " << full_map->size() << " points into file: " << map_file);
         }
     }
     else{
         ROS_WARN_STREAM("Unexpected command input: " << s.data);
     }
+    ROS_WARN(" DONE ");
 }
 
 
@@ -128,16 +132,29 @@ int main(int argc, char **argv) {
     nh.getParam("save_trajectory_en", gb_save_trajectory);
     nh.getParam("save_map_en", gb_save_map);
 
-    nh.getParam("trajectory_save_file", g_trajectory_file);
-    nh.getParam("map_save_file", g_map_file);
+    nh.getParam("output_folder", g_output_folder);
+    nh.getParam("method", g_method_name);
+    nh.getParam("map_type", g_map_type);
     nh.getParam("map_downsample_size", g_map_ds_size);
+
+    string odom_topic("/Odometry");
+    string map_topic("/cloud_registered");
+    nh.getParam("odom_topic", odom_topic);
+    nh.getParam("map_topic", map_topic);
+
+    ROS_WARN("Settings: ");
+    ROS_INFO_STREAM("Output folder: " << g_output_folder);
+    ROS_INFO_STREAM("SLAM method  : " << g_method_name);
+    ROS_INFO_STREAM("Map save type: " << g_map_type);
+    ROS_INFO_STREAM("Map d size(m): " << g_map_ds_size);
 
     // start to save map/trajectory
     // rostopic pub /cmd std_msgs/String "s" -1
     ros::Subscriber subString = nh.subscribe<std_msgs::String>("/cmd", 1, commandHandler);
-    // TODO: modify the topic name according to your slam algorithm
-    ros::Subscriber subOdometry = nh.subscribe<nav_msgs::Odometry>("/Odometry", 100, odomHandler);
-    ros::Subscriber subMap = nh.subscribe<sensor_msgs::PointCloud2>("/cloud_registered", 100, registeredCloudHandler);
+    ros::Subscriber subOdometry = nh.subscribe<nav_msgs::Odometry>(odom_topic, 100, odomHandler);
+    ros::Subscriber subMap = nh.subscribe<sensor_msgs::PointCloud2>(map_topic, 100, registeredCloudHandler);
+    ROS_WARN_STREAM("Starting to receive topics: "<<odom_topic <<", "<<map_topic);
+
     ros::Rate r(100);
     while (ros::ok()) {
         ros::spinOnce();

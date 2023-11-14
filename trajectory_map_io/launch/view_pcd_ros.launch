@@ -1,0 +1,13 @@
+<launch>
+<!-- Launch file for Livox AVIA LiDAR -->
+
+    
+    <node pkg="trajectory_saver" type="view_pcd_ros" name="view_pcd_ros" output="screen">
+
+        <!-- save trajectory and map  -->
+        <!-- <param name="pcd_filename" type="string" value="/home/larrydong/slam-map.pcd"/> -->
+
+    </node>
+	<node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz_compare_pc" args="-d $(find trajectory_saver)/rviz/pointcloud_compare.rviz" />
+
+</launch>

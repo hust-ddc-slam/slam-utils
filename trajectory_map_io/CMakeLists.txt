@@ -32,7 +32,14 @@ add_executable(save_trajectory_node
 )
 target_link_libraries(save_trajectory_node ${LIVOX_LIDAR_SDK_LIBRARY} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
-add_executable(view_pcd 
-    src/view_pcd.cpp
+add_executable(view_pcd_pcl
+    src/view_pcd_pcl.cpp
 )
-target_link_libraries(view_pcd ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(view_pcd_pcl ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+
+
+add_executable(view_pcd_ros
+    src/view_pcd_ros.cpp
+)
+target_link_libraries(view_pcd_ros ${catkin_LIBRARIES} ${PCL_LIBRARIES})
