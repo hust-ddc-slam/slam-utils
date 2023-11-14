@@ -31,13 +31,6 @@ Good news! Now you only need to modify the `save_trajectory.launch` file for rec
 - `odom_topic`/`map_topic`: change this name to register the odometry/(registered)scan topic from your SLAM method.
 
 
-- Modify the laser-scan's topic and odom's topic name in source codes;
-- Modify the output file path in launch file;
-- Assert laser-scan's type is `PointType` defined in source codes;
-- Modify the map downsampling size if needed;
-
-
-
 ### Loading and view a PCD file.
 The `view_pcd` codes can view a PCD file in PCL viewer.
 ```bash
