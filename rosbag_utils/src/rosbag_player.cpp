@@ -3,9 +3,16 @@
 #include <rosbag/view.h>
 #include <sensor_msgs/Imu.h>
 #include <boost/foreach.hpp>
-#include <livox_ros_driver/CustomMsg.h>
+#include <sensor_msgs/PointCloud2.h>
+
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+
+#include <livox_ros_driver2/CustomMsg.h>
 
 #include <csignal>
+#include <iostream>
 #include <vector>
 
 using namespace std;
@@ -13,8 +20,12 @@ using namespace std;
 #define LiDAR_Frequency (10)
 #define IMU_Frequency (200)
 
-typedef livox_ros_driver::CustomMsg LidarType;
+typedef livox_ros_driver2::CustomMsg LidarType;
 typedef sensor_msgs::Imu ImuType;
+
+typedef pcl::PointXYZI PointType;
+typedef pcl::PointCloud<PointType> PointCloudType;
+typedef sensor_msgs::PointCloud2 RosPointCloudType;
 
 
 bool flg_exit = false;
@@ -25,25 +36,50 @@ void SigHandle(int sig){
 }
 
 
+void livoxCustomMsg2RosPointCloud2(const LidarType& customMsg, RosPointCloudType& rosMsg){
+    PointCloudType pc;
+    for(int i=0; i<customMsg.point_num; ++i){
+        auto p = customMsg.points[i];
+        if(abs(p.x)<0.01 || abs(p.y) < 0.01)            // skip too-near points.
+            continue;
+        PointType p_new;
+        p_new.x = p.x;
+        p_new.y = p.y;
+        p_new.z = p.z;
+        p_new.intensity = float(p.offset_time);
+        pc.points.push_back(p_new);
+    }
+    pcl::toROSMsg(pc, rosMsg);
+    rosMsg.header = customMsg.header;
+}
+
+
 int main(int argc, char **argv){
 
     ros::init(argc, argv, "rosbag_player");
     ros::NodeHandle nh("~");
 
     string bag_file("/default");
-    string lidar_topic("/livox/lidar"), imu_topic("/livox/imu");
+    string lidar_topic("/livox/lidar"), imu_topic("/livox/imu");        // original rosbag data
+    string pointcloud_topic("/pointcloud");     // convert to ros PointCloud2 for rviz view
+    int flag_show_pointcloud = 0;
 
     nh.getParam("bag_file", bag_file);
     nh.getParam("lidar_topic", lidar_topic);
     nh.getParam("imu_topic", imu_topic);
+    nh.getParam("pointcloud_topic", pointcloud_topic);
+    nh.getParam("show_pointcloud", flag_show_pointcloud);
 
-    // 创建lidar和IMU的发布者
     ros::Publisher pub_lidar = nh.advertise<LidarType>(lidar_topic, 10);
     ros::Publisher pub_imu = nh.advertise<ImuType>(imu_topic, 200);
+    ros::Publisher pub_pointcloud2 = nh.advertise<RosPointCloudType>(pointcloud_topic, 10);
 
-    ROS_WARN_STREAM("Rosbag from: " << bag_file);
-    ROS_WARN_STREAM("Lidar topic: " << lidar_topic);
-    ROS_WARN_STREAM("IMU topic  : " << imu_topic);
+    ROS_WARN("Settings: ");
+    ROS_INFO_STREAM("Rosbag from: " << bag_file);
+    ROS_INFO_STREAM("Lidar topic: " << lidar_topic);
+    ROS_INFO_STREAM("IMU topic  : " << imu_topic);
+    ROS_INFO_STREAM("Show ROS PC: " << flag_show_pointcloud);
+    ROS_INFO_STREAM("Output PC  : " << pointcloud_topic);
 
     rosbag::Bag bag;
     bag.open(bag_file, rosbag::bagmode::Read);
@@ -87,18 +123,37 @@ int main(int argc, char **argv){
 
     // Play back the datas.
     int lidar_idx = 0, imu_idx = 0;
+    bool is_first_pub = true;
+    double first_scan_time = 0.0;
     while (lidar_idx < lidars.size() && imu_idx < imus.size()){
-        auto lidar = lidars[lidar_idx];
-        double lidar_time = lidar.header.stamp.toSec();
-        pub_lidar.publish(lidars[lidar_idx]);
+        // publish lidar(livox CustomMsg) for other methods
+        const LidarType& scan = lidars[lidar_idx];
+        double scan_time = scan.header.stamp.toSec();
+        pub_lidar.publish(scan);
+        if(is_first_pub){
+            is_first_pub = false;
+            first_scan_time = scan.header.stamp.toSec();
+            std::cout << "----------------------------------" << endl;
+            ROS_INFO_STREAM("lidar frame_id is: " << scan.header.frame_id);
+            std::cout << std::fixed << "first scan time: " << first_scan_time << std::endl;
+        }
+
+        // publish lidar(ros PointCloud2) for rviz
+        if (flag_show_pointcloud == 1){
+            RosPointCloudType rosMsg;
+            livoxCustomMsg2RosPointCloud2(scan, rosMsg);
+            pub_pointcloud2.publish(rosMsg);
+        }
+
         int imu_cnt = 0;
-        while(imus[imu_idx].header.stamp.toSec()<lidar_time && imu_idx<imus.size()){
+        while(imus[imu_idx].header.stamp.toSec()<scan_time && imu_idx<imus.size()){
             pub_imu.publish(imus[imu_idx]);
             imu_idx++;
             imu_cnt++;
         }
+        cout << "--> Publish scan: " << lidar_idx << ", at time:  " << (scan_time-first_scan_time) << "s, and imu number: " << imu_cnt << endl;
         lidar_idx++;
-        cout << "-- Publish lidar at time:  " << lidar_time << ", and imu number: " << imu_cnt << endl;
+
         int key = std::cin.get();
         if(key == 'q' || key=='s')          // stop with input: 's' or 'q'
             break;

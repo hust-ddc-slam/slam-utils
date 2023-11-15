@@ -20,8 +20,11 @@ Check the `rosbag_play.launch` file:
 - `bag_file`: which rosbag to load.
 - `lidar_topic`/`imu_topic`: lidar and imu's topic in rosbag.
 
-The defaut Lidar message format is: `livox_ros_driver::CustomMsg`, and IMU message format is: `sensor_msgs::Imu`.  
-You need to modify the source code if lidar/imu are not those format.
+
+The defaut Lidar message format is: `livox_ros_driver2::CustomMsg`, and IMU message format is: `sensor_msgs::Imu`.  
+You need to modify the source code if lidar/imu are not those format.  
+(Attention: you should pay attention if you're using 'livox_ros_driver' or 'livox_ros_driver2')
+
 
 
 

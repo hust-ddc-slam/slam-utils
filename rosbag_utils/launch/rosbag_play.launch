@@ -3,11 +3,16 @@
     <node pkg="rosbag_utils" type="rosbag_player" name="rosbag_player" output="screen">
 
         <!-- bag file -->
-        <param name="bag_file" type="string" value="/home/larrydong/fast-lio_ws/data/balcony_5th_floor_avia.bag"/>
+        <!-- <param name="bag_file" type="string" value="/home/larrydong/fast-lio_ws/data/balcony_5th_floor_avia.bag"/> -->
+        <param name="bag_file" type="string" value="/home/larrydong/fast-lio_ws/data/202311-Floor3/lwx/lwx-2-1.bag"/>
 
         <!-- topics -->
         <param name="lidar_topic" type="string" value="/livox/lidar"/>
         <param name="imu_topic" type="string" value="/livox/imu"/>
+        
+        <!-- output ros msg pointcloud -->
+        <param name="pointcloud_topic" type="string" value="/ros_pointcloud2"/>
+        <param name="show_pointcloud" type="int" value="1"/>
     
     </node>
 

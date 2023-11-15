@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
     nav_msgs
     rosbag
     pcl_ros
-    livox_ros_driver
+    livox_ros_driver2
 )
 
 catkin_package()
