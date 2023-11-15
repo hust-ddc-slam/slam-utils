@@ -8,7 +8,7 @@
 
         <!-- path and file names for saving -->
         <param name="output_folder" type="string" value="/home/larrydong/Desktop/"/>
-        <param name="method" type="string" value="fastlio"/>
+        <param name="method" type="string" value="liolivox"/>
 
         <!-- map settings -->
         <param name="map_downsample_size" type="double" value="0.1"/>
@@ -16,13 +16,12 @@
         
         <!-- Topics for odom and map to receive -->
         <!-- For Fast-lio -->
-        <param name="odom_topic" type="string" value="/Odometry"/>
-        <param name="map_topic" type="string" value="/cloud_registered"/>
+        <!-- <param name="odom_topic" type="string" value="/Odometry"/>
+        <param name="map_topic" type="string" value="/cloud_registered"/> -->
 
         <!-- For Lio-livox -->
-        <!-- <param name="odom_topic" type="string" value="/Odometry"/>
-        <param name="map_topic" type="string" value="/livox_full_cloud_mapped"/> -->
-
+        <param name="map_topic" type="string" value="/livox_full_cloud_mapped"/>
+        <param name="odom_topic" type="string" value="/livox_odometry_mapped"/>
     </node>
 
 </launch>
