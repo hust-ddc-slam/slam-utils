@@ -1,49 +1,27 @@
 
-# rosbag_play
+# rosbag_utils
 
-This package control the output of a rosbag.
+This package include some rosbag process code.
 
+`rosbag_play` generate lidar scan each time of a rosbag.
+`rosbag_output` write some rosbag data to a txt for further analysize (TODO).
 
-## Usage
+## rosbag_play
 
-### Saving trajectory and map:
-
-Since some slam-code publish odom (not path), and registered laser scan (not full map),  
-this code just save odometry and scan when running, and save to file when received the command.
-
-Trajectory codes can be saved to a `txt` or `csv` file, and map can be saved as `ply` or `pcd` file.
-
-Run this node:
+### Usage
 ```bash
-# subscribe the odom and map data.
-roslaunch trajectory_saver save_trajectory.launch
-# in a new terminal type the following line to save data.
-rostopic pub /cmd std_msgs/String "s" -1   
+roslaunch rosbag_utils rosbag_player
 ```
+Then type "Enter" key in the terminal to generate a lidar scan with corresponding IMUs.  
+Type 's' or 'q' and then type "Enter" to stop the program.  
 
-**How to modify?**
-Good news! Now you only need to modify the `save_trajectory.launch` file for recording. Check the parameters in launch file:  
-- `save_trajectory_en`/`save_map_en`: save or not save trajectory and map.
-- `output_folder`: the folder to save the output files. Remeber to add the / at the end. 
-- `method`: could be fastlio/liosam, whatever. This method will be the name of trajectory and map output, e.g., "fastlio.txt", "fastlio.pcd"
-- `map_type`: output map's type, "pcd" or "ply".
-- `map_downsample_size`: downsampling size of the output map. 0.1 for small/indoor scenes, and 0.2 or larger for large outdoor scene is recommanded.
-- `odom_topic`/`map_topic`: change this name to register the odometry/(registered)scan topic from your SLAM method.
+### How to modify
+Check the `rosbag_play.launch` file:
+- `bag_file`: which rosbag to load.
+- `lidar_topic`/`imu_topic`: lidar and imu's topic in rosbag.
 
-
-### Loading and view a PCD file.
-
-**View (multiple) PCD map in ROS**
-```bash
-roslaunch trajectory_saver view_pcd_ros.launch
-```
-
-**How to modify?**
-check `view_pcd_ros.launch` file, and change configure:
-- `map_folder`: where to load all PCD files.
-- `pointcloud_number`: how many PCD files are loaded. 
-- `pcX` (X=0~4): PCD to view. X>`pointcloud_number` will not be loaded and shown.
-
+The defaut Lidar message format is: `livox_ros_driver::CustomMsg`, and IMU message format is: `sensor_msgs::Imu`.  
+You need to modify the source code if lidar/imu are not those format.
 
 
 

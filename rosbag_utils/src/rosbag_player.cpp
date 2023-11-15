@@ -27,18 +27,26 @@ void SigHandle(int sig){
 
 int main(int argc, char **argv){
 
-    // 初始化ROS节点
-    ros::init(argc, argv, "rosbag_reader");
-    ros::NodeHandle nh;
+    ros::init(argc, argv, "rosbag_player");
+    ros::NodeHandle nh("~");
+
+    string bag_file("/default");
+    string lidar_topic("/livox/lidar"), imu_topic("/livox/imu");
+
+    nh.getParam("bag_file", bag_file);
+    nh.getParam("lidar_topic", lidar_topic);
+    nh.getParam("imu_topic", imu_topic);
 
     // 创建lidar和IMU的发布者
-    ros::Publisher pub_lidar = nh.advertise<LidarType>("/livox/lidar", 10);
-    ros::Publisher pub_imu = nh.advertise<ImuType>("/livox/imu", 200);
+    ros::Publisher pub_lidar = nh.advertise<LidarType>(lidar_topic, 10);
+    ros::Publisher pub_imu = nh.advertise<ImuType>(imu_topic, 200);
 
-    // 打开rosbag文件
-    string bag_name = "/home/larrydong/fast-lio_ws/data/balcony_5th_floor_avia.bag";
+    ROS_WARN_STREAM("Rosbag from: " << bag_file);
+    ROS_WARN_STREAM("Lidar topic: " << lidar_topic);
+    ROS_WARN_STREAM("IMU topic  : " << imu_topic);
+
     rosbag::Bag bag;
-    bag.open(bag_name, rosbag::bagmode::Read);
+    bag.open(bag_file, rosbag::bagmode::Read);
     if(!bag.isOpen()){
         ROS_ERROR("Cannot find rosbag: ");
         return -1;
@@ -46,23 +54,23 @@ int main(int argc, char **argv){
 
     // 设置过滤器读取lidar和IMU数据
     std::vector<std::string> topics;
-    topics.push_back("/livox/lidar");
-    topics.push_back("/livox/imu");
+    topics.push_back(lidar_topic);
+    topics.push_back(imu_topic);
     rosbag::View view(bag, rosbag::TopicQuery(topics));
-    ROS_INFO_STREAM("--> Loading from bag: " << bag_name);
+    ROS_INFO_STREAM("--> Loading from bag: " << bag_file);
 
     // get bag times
     ros::Time bag_begin_time = view.getBeginTime();
     ros::Time bag_end_time = view.getEndTime();
     double duration = (bag_end_time-bag_begin_time).toSec();
     
-    int cnt_lidar = 0, cnt_imu = 0;
-
+    // create vector to save lidar/imus
     vector<LidarType> lidars;
     vector<ImuType> imus;
     lidars.reserve((int)(duration+1)*LiDAR_Frequency);
     imus.reserve((int)(duration+1)*IMU_Frequency);
 
+    // load data
     for (rosbag::View::iterator it = view.begin(); it != view.end(); ++it) {
         const rosbag::MessageInstance& msg = *it;
         if (msg.isType<ImuType>()) {
@@ -92,7 +100,7 @@ int main(int argc, char **argv){
         lidar_idx++;
         cout << "-- Publish lidar at time:  " << lidar_time << ", and imu number: " << imu_cnt << endl;
         int key = std::cin.get();
-        if(key == 'q' || key=='s')
+        if(key == 'q' || key=='s')          // stop with input: 's' or 'q'
             break;
     }
 
