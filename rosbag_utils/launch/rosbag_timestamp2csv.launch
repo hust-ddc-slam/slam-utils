@@ -1,0 +1,18 @@
+<launch>
+
+    <node pkg="rosbag_utils" type="rosbag_timestamp2csv" name="rosbag_timestamp2csv" output="screen">
+
+        <param name="input_bag" type="string" value="/home/larrydong/Data/subT_urban_UGV1-PC2.bag"/>
+        <param name="output_csv" type="string" value="/home/larrydong/subT_urban_UGV1.csv"/>
+
+        <!-- topics -->
+        <param name="lidar_topic" type="string" value="/velodyne_points"/>
+        <param name="imu_topic" type="string" value="/imu/data"/>
+
+        <!-- output imu, lidar or not -->
+        <param name="imu_en" type="int" value="0"/>
+        <param name="lidar_en" type="int" value="1"/>
+
+    </node>
+
+</launch>

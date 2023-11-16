@@ -26,5 +26,16 @@ You need to modify the source code if lidar/imu are not those format.
 (Attention: you should pay attention if you're using 'livox_ros_driver' or 'livox_ros_driver2')
 
 
+## rosbag_merge
+
+Merge rosbag index from '0.bag' to 'N.bag' in one folder.  
+Maybe need "/scripts/rename.bash" to change all rosbag into 0~N order.  
+Output a merged rosbag.
+
+
+## rosbag_timestamp2csv
+
+This read a rosbag and write topic's timestamp into a csv.  
+
 
 

@@ -30,7 +30,21 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 
+## replay a rosbag controled by keys
 add_executable(rosbag_player 
     src/rosbag_player.cpp
 )
 target_link_libraries(rosbag_player ${LIVOX_LIDAR_SDK_LIBRARY} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+
+## merge several rosbag.
+add_executable(rosbag_merge 
+    src/rosbag_merge.cpp
+)
+target_link_libraries(rosbag_merge ${LIVOX_LIDAR_SDK_LIBRARY} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+## output a rosbag messages' timestamp into csv file
+add_executable(rosbag_timestamp2csv
+    src/rosbag_timestamp2csv.cpp
+)
+target_link_libraries(rosbag_timestamp2csv ${LIVOX_LIDAR_SDK_LIBRARY} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
