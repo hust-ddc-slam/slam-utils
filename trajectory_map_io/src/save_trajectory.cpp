@@ -67,7 +67,7 @@ void commandHandler(const std_msgs::String s){
             const string trajectory_file(g_output_folder + g_method_name + ".txt");
             ofstream out(trajectory_file, ios::out);
             ROS_INFO("--> Start to save trajectory (TUM format)");
-            out << "# timestampe x y z qx qy qz qw" << endl;
+            // out << "# timestampe x y z qx qy qz qw" << endl;
             for(auto odom : gv_odoms){
                 geometry_msgs::Pose p = odom.pose.pose;
                 out << std::setprecision(15) << odom.header.stamp.toSec() << " "
