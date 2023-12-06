@@ -48,3 +48,10 @@ add_executable(rosbag_timestamp2csv
     src/rosbag_timestamp2csv.cpp
 )
 target_link_libraries(rosbag_timestamp2csv ${LIVOX_LIDAR_SDK_LIBRARY} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+
+## output a rosbag IMU and chassis into csv file
+add_executable(rosbag_exportChassisIMU
+    src/rosbag_export_chassis_imu.cpp
+)
+target_link_libraries(rosbag_exportChassisIMU ${LIVOX_LIDAR_SDK_LIBRARY} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
