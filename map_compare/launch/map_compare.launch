@@ -1,0 +1,16 @@
+<launch>
+
+  <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find map_compare)/rviz_cfg/rviz.rviz" />
+    
+
+  <param name="dae_file" value="/home/larrydong/Desktop/city_bump_res/city-clean-dae.dae"/>
+  <param name="file_gt" value="/home/larrydong/Desktop/city_bump_res/city-clean-small.ply"/>
+  <param name="file_slam" value="/home/larrydong/Desktop/city_bump_res/fastlio-cov.ply"/>
+  <param name="leaf_size" value="0.5"/>
+  <param name="sample_size" value="20000"/>
+
+  <node name="map_compare" pkg="map_compare" type="map_compare_node" output="screen"/>
+
+
+
+</launch>
