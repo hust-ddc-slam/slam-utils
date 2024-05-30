@@ -7,7 +7,7 @@
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/random_sample.h>
-
+#include <Eigen/Dense>
 
 
 using PointT = pcl::PointXYZ;
@@ -69,12 +69,15 @@ int main(int argc, char** argv) {
     PointCloud::Ptr cloud_gt(new PointCloud);
     PointCloud::Ptr cloud_slam(new PointCloud);
 
+    ROS_INFO_STREAM("--> Loading GT map from: " << file_gt);
     if (pcl::io::loadPLYFile<PointT>(file_gt, *cloud_gt) == -1) {
         ROS_ERROR("Couldn't read GT map: %s", file_gt.c_str());
         return -1;
     }
     ROS_INFO_STREAM("--> GT loaded. Size: " << cloud_gt->points.size());
 
+
+    ROS_INFO_STREAM("--> Loading SLAM map from: " << file_slam);
     if (pcl::io::loadPLYFile<PointT>(file_slam, *cloud_slam) == -1) {
         ROS_ERROR("Couldn't read SLAM map: %s", file_slam.c_str());
         return -1;
@@ -119,13 +122,26 @@ int main(int argc, char** argv) {
     ROS_INFO_STREAM("<-- DS done. Size1: " << pc_gt->points.size() <<", size2: " << pc_slam->points.size());
     
     
+#define OUTDOOR_SCENE
+#ifdef OUTDOOR_SCENE
+    // initial estimation (only-for outdoor scene)
+    Eigen::Affine3f init_trans = Eigen::Affine3f::Identity();
+    init_trans.rotate(Eigen::AngleAxisf(M_PI/2, Eigen::Vector3f::UnitZ()));
+    init_trans.translation() << 50, 0, 0;      // outdoor init transformation
+    PointCloud::Ptr pc_slam_trans(new PointCloud);
+    pcl::transformPointCloud(*pc_slam, *pc_slam_trans, init_trans);
+    pc_slam = pc_slam_trans;
+    ROS_WARN("Using Outdoor transformation!!!");
+    ROS_INFO_STREAM("Init translation: \n" << init_trans.matrix());
+#endif
+    
     pcl::IterativeClosestPoint<PointT, PointT> icp;
     icp.setInputSource(pc_slam);
     icp.setInputTarget(pc_gt);
     icp.setMaximumIterations(100); // Increase maximum iterations for higher precision
     icp.setTransformationEpsilon(1e-9); // Increase transformation epsilon for higher precision
     icp.setEuclideanFitnessEpsilon(1e-9); // Increase fitness epsilon for higher precision
-
+    
     PointCloud::Ptr cloud_aligned(new PointCloud);
     ROS_INFO("--> Begin ICP...");
     icp.align(*cloud_aligned);

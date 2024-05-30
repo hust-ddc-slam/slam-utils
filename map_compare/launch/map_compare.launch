@@ -4,8 +4,8 @@
     
 
   <param name="dae_file" value="/home/larrydong/Desktop/city_bump_res/city-clean-dae.dae"/>
-  <param name="file_gt" value="/home/larrydong/Desktop/city_bump_res/city-clean-small.ply"/>
-  <param name="file_slam" value="/home/larrydong/Desktop/city_bump_res/fastlio-cov.ply"/>
+  <param name="file_gt" value="/home/larrydong/Desktop/map_gt/outdoor_simple.ply"/>
+  <param name="file_slam" value="/home/larrydong/Desktop/wild_step1_30cm/fastlio.ply"/>
   <param name="leaf_size" value="0.5"/>
   <param name="sample_size" value="20000"/>
 

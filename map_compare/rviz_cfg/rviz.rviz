@@ -4,10 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
-        - /Status1
         - /gt1
-        - /slam1
         - /slam-reg1
       Splitter Ratio: 0.5
     Tree Height: 719
@@ -36,8 +33,17 @@ Toolbars:
 Visualization Manager:
   Class: ""
   Displays:
+    - Alpha: 1
+      Class: rviz/Axes
+      Enabled: true
+      Length: 50
+      Name: Axes
+      Radius: 1
+      Reference Frame: <Fixed Frame>
+      Show Trail: false
+      Value: true
     - Alpha: 0.5
-      Cell Size: 1
+      Cell Size: 10
       Class: rviz/Grid
       Color: 160; 160; 164
       Enabled: true
@@ -51,7 +57,7 @@ Visualization Manager:
         Y: 0
         Z: 0
       Plane: XY
-      Plane Cell Count: 10
+      Plane Cell Count: 50
       Reference Frame: <Fixed Frame>
       Value: true
     - Alpha: 0.5
@@ -166,7 +172,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 264.230712890625
+      Distance: 390.2162170410156
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -174,17 +180,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 67.21533203125
-        Y: 43.04063415527344
-        Z: -28.523578643798828
+        X: 6.895095348358154
+        Y: 28.187456130981445
+        Z: -85.08975982666016
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.029796838760376
+      Pitch: 0.9547971487045288
       Target Frame: <Fixed Frame>
-      Yaw: 3.9154253005981445
+      Yaw: 5.150457859039307
     Saved: ~
 Window Geometry:
   Displays:
