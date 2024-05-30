@@ -23,8 +23,10 @@ using namespace std;
 typedef pcl::PointXYZ PointType;                    // modify this pcl point type, based on slam's resigtered output.
 typedef pcl::PointCloud<PointType> PointCloudType;
 
+int gb_finished(false);
+
 // save trajectory and map
-int gb_save_trajectory(true), gb_save_map(true);
+int gb_save_trajectory(true), gb_save_map(true), gb_use_original_ts(true);
 std::mutex g_odom_mutex, g_map_mutex;
 
 // record lidar-scan and odoms
@@ -62,6 +64,8 @@ void commandHandler(const std_msgs::String s){
         ROS_INFO("====== Save trajectory and map. ======");
         ROS_INFO_STREAM("       save trajectory?: " << gb_save_trajectory <<", save map?: " << gb_save_map);
 
+        bool first_data = true;
+        double first_ts = 0.0f;
         if(gb_save_trajectory){ 
             g_odom_mutex.lock();
             const string trajectory_file(g_output_folder + g_method_name + ".txt");
@@ -70,7 +74,18 @@ void commandHandler(const std_msgs::String s){
             // out << "# timestampe x y z qx qy qz qw" << endl;
             for(auto odom : gv_odoms){
                 geometry_msgs::Pose p = odom.pose.pose;
-                out << std::setprecision(15) << odom.header.stamp.toSec() << " "
+                if(first_data){
+                    first_data = false;
+                    first_ts = odom.header.stamp.toSec();
+                }
+
+                double current_ts = 0;
+                if(gb_use_original_ts)
+                    current_ts = odom.header.stamp.toSec();
+                else 
+                    current_ts = odom.header.stamp.toSec() - first_ts;
+
+                out << std::setprecision(15) << current_ts << " "
                     << std::setprecision(8)
                     << p.position.x << " "
                     << p.position.y << " "
@@ -119,6 +134,7 @@ void commandHandler(const std_msgs::String s){
         ROS_WARN_STREAM("Unexpected command input: " << s.data);
     }
     ROS_WARN(" DONE ");
+    gb_finished = true;
 }
 
 
@@ -131,6 +147,7 @@ int main(int argc, char **argv) {
 
     nh.getParam("save_trajectory_en", gb_save_trajectory);
     nh.getParam("save_map_en", gb_save_map);
+    nh.getParam("use_original_ts", gb_use_original_ts);
 
     nh.getParam("output_folder", g_output_folder);
     nh.getParam("method", g_method_name);
@@ -146,6 +163,8 @@ int main(int argc, char **argv) {
     ROS_INFO_STREAM("Output folder: " << g_output_folder);
     ROS_INFO_STREAM("SLAM method  : " << g_method_name);
     ROS_INFO_STREAM("Map save type: " << g_map_type);
+    string ts_type = gb_use_original_ts ? "original timestamp" : "from 0";
+    ROS_INFO_STREAM("Timestamp begin from : " << ts_type);
     ROS_INFO_STREAM("Map d size(m): " << g_map_ds_size);
 
     // start to save map/trajectory
@@ -156,7 +175,7 @@ int main(int argc, char **argv) {
     ROS_WARN_STREAM("Starting to receive topics: "<<odom_topic <<", "<<map_topic);
 
     ros::Rate r(100);
-    while (ros::ok()) {
+    while (ros::ok() && !gb_finished) {
         ros::spinOnce();
         r.sleep();
     }

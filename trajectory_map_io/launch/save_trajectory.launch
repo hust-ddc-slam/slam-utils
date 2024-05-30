@@ -8,11 +8,14 @@
 
         <!-- path and file names for saving -->
         <param name="output_folder" type="string" value="/home/larrydong/Desktop/"/>
-        <param name="method" type="string" value="fastlio"/>
+        <param name="method" type="string" value="fastlio-cov"/>
 
         <!-- map settings -->
-        <param name="map_downsample_size" type="double" value="0.1"/>
-        <param name="map_type" type="string" value="pcd"/>
+        <param name="map_downsample_size" type="double" value="0.5"/>
+        <param name="map_type" type="string" value="ply"/>
+
+        <!-- path settings -->
+        <param name="use_original_ts" type="int" value="0"/>
         
         <!-- Topics for odom and map to receive -->
         <!-- For Fast-lio -->
