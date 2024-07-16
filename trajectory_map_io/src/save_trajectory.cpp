@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
 
     ROS_WARN("Settings: ");
     ROS_INFO_STREAM("Output folder: " << g_output_folder);
-    ROS_INFO_STREAM("SLAM method  : " << g_method_name);
+    ROS_WARN_STREAM("SLAM method  : " << g_method_name);
     ROS_INFO_STREAM("Map save type: " << g_map_type);
     string ts_type = gb_use_original_ts ? "original timestamp" : "from 0";
     ROS_INFO_STREAM("Timestamp begin from : " << ts_type);

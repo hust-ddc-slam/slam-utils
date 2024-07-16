@@ -15,7 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
     nav_msgs
     rosbag
     pcl_ros
-    livox_ros_driver2
 )
 
 catkin_package()
@@ -34,24 +33,17 @@ add_definitions(${PCL_DEFINITIONS})
 add_executable(rosbag_player 
     src/rosbag_player.cpp
 )
-target_link_libraries(rosbag_player ${LIVOX_LIDAR_SDK_LIBRARY} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(rosbag_player  ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
-
-## merge several rosbag.
-add_executable(rosbag_merge 
-    src/rosbag_merge.cpp
+# convert a 128 lines rosbag to 32 lines
+add_executable(ouster_converter 
+    src/ouster128to32.cpp
 )
-target_link_libraries(rosbag_merge ${LIVOX_LIDAR_SDK_LIBRARY} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(ouster_converter  ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
-## output a rosbag messages' timestamp into csv file
-add_executable(rosbag_timestamp2csv
-    src/rosbag_timestamp2csv.cpp
+
+## change a frame id for /
+add_executable(change_frameid 
+    src/change_frameid.cpp
 )
-target_link_libraries(rosbag_timestamp2csv ${LIVOX_LIDAR_SDK_LIBRARY} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
-
-
-## output a rosbag IMU and chassis into csv file
-add_executable(rosbag_exportChassisIMU
-    src/rosbag_export_chassis_imu.cpp
-)
-target_link_libraries(rosbag_exportChassisIMU ${LIVOX_LIDAR_SDK_LIBRARY} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(change_frameid  ${catkin_LIBRARIES} ${PCL_LIBRARIES})

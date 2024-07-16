@@ -9,7 +9,6 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
-#include <livox_ros_driver2/CustomMsg.h>
 
 #include <csignal>
 #include <iostream>
@@ -18,9 +17,9 @@
 using namespace std;
 
 #define LiDAR_Frequency (10)
-#define IMU_Frequency (200)
+#define IMU_Frequency (100)
 
-typedef livox_ros_driver2::CustomMsg LidarType;
+typedef sensor_msgs::PointCloud2 LidarType;
 typedef sensor_msgs::Imu ImuType;
 
 typedef pcl::PointXYZI PointType;
@@ -36,31 +35,13 @@ void SigHandle(int sig){
 }
 
 
-void livoxCustomMsg2RosPointCloud2(const LidarType& customMsg, RosPointCloudType& rosMsg){
-    PointCloudType pc;
-    for(int i=0; i<customMsg.point_num; ++i){
-        auto p = customMsg.points[i];
-        if(abs(p.x)<0.01 || abs(p.y) < 0.01)            // skip too-near points.
-            continue;
-        PointType p_new;
-        p_new.x = p.x;
-        p_new.y = p.y;
-        p_new.z = p.z;
-        p_new.intensity = float(p.offset_time);
-        pc.points.push_back(p_new);
-    }
-    pcl::toROSMsg(pc, rosMsg);
-    rosMsg.header = customMsg.header;
-}
-
-
 int main(int argc, char **argv){
 
     ros::init(argc, argv, "rosbag_player");
     ros::NodeHandle nh("~");
 
     string bag_file("/default");
-    string lidar_topic("/livox/lidar"), imu_topic("/livox/imu");        // original rosbag data
+    string lidar_topic("/ouster/points"), imu_topic("/ouster/imu");        // original rosbag data
     string pointcloud_topic("/pointcloud");     // convert to ros PointCloud2 for rviz view
     int flag_show_pointcloud = 0;
 
@@ -138,12 +119,6 @@ int main(int argc, char **argv){
             std::cout << std::fixed << "first scan time: " << first_scan_time << std::endl;
         }
 
-        // publish lidar(ros PointCloud2) for rviz
-        if (flag_show_pointcloud == 1){
-            RosPointCloudType rosMsg;
-            livoxCustomMsg2RosPointCloud2(scan, rosMsg);
-            pub_pointcloud2.publish(rosMsg);
-        }
 
         int imu_cnt = 0;
         while(imus[imu_idx].header.stamp.toSec()<scan_time && imu_idx<imus.size()){
@@ -153,7 +128,15 @@ int main(int argc, char **argv){
         }
         cout << "--> Publish scan: " << lidar_idx << ", at time:  " << (scan_time-first_scan_time) << "s, and imu number: " << imu_cnt << endl;
         lidar_idx++;
-
+        // int key = -1;
+        // while(key==-1){
+        //     key = std::cin.get();
+        //     if(key == EOF){
+        //         std::cin.clear();
+        //         std::cin.ignore();
+        //         key = -1;
+        //     }        ROS_INFO_STREAM("Key is: " << key);
+        // }
         int key = std::cin.get();
         if(key == 'q' || key=='s')          // stop with input: 's' or 'q'
             break;

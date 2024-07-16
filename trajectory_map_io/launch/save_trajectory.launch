@@ -7,11 +7,11 @@
         <param name="save_map_en" type="int" value="1"/>
 
         <!-- path and file names for saving -->
-        <param name="output_folder" type="string" value="/home/larrydong/Desktop/"/>
-        <param name="method" type="string" value="fastlio-cov"/>
+        <param name="output_folder" type="string" value="/home/larry/Desktop/"/>
+        <param name="method" type="string" value="test-align"/>
 
         <!-- map settings -->
-        <param name="map_downsample_size" type="double" value="0.5"/>
+        <param name="map_downsample_size" type="double" value="0.2"/>
         <param name="map_type" type="string" value="ply"/>
 
         <!-- path settings -->
