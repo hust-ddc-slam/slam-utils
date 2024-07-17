@@ -47,3 +47,10 @@ add_executable(change_frameid
     src/change_frameid.cpp
 )
 target_link_libraries(change_frameid  ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+
+## merge NCD bags and clean
+add_executable(process_NCD
+    src/process_NCD.cpp
+)
+target_link_libraries(process_NCD  ${catkin_LIBRARIES} ${PCL_LIBRARIES})
