@@ -57,7 +57,6 @@ void odomHandler(const nav_msgs::Odometry::ConstPtr &odom){
     gv_odoms.push_back(*odom);
     g_odom_mutex.unlock();
 }
-
 // capture the "save" command
 void commandHandler(const std_msgs::String s){
     if(s.data == "s"){
@@ -77,6 +76,7 @@ void commandHandler(const std_msgs::String s){
                 if(first_data){
                     first_data = false;
                     first_ts = odom.header.stamp.toSec();
+                    ROS_INFO_STREAM("  First ts is: " << first_ts);
                 }
 
                 double current_ts = 0;
@@ -84,7 +84,6 @@ void commandHandler(const std_msgs::String s){
                     current_ts = odom.header.stamp.toSec();
                 else 
                     current_ts = odom.header.stamp.toSec() - first_ts;
-
                 out << std::setprecision(15) << current_ts << " "
                     << std::setprecision(8)
                     << p.position.x << " "

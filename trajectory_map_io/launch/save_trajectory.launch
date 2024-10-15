@@ -1,4 +1,6 @@
 <launch>
+    <arg name="method" default="fastlio"/>
+    <arg name="output_folder" default="/home/larry/Desktop/"/>
 
     <node pkg="trajectory_saver" type="save_trajectory_node" name="save_trajectory_node" output="screen">
 
@@ -7,8 +9,8 @@
         <param name="save_map_en" type="int" value="1"/>
 
         <!-- path and file names for saving -->
-        <param name="output_folder" type="string" value="/home/larry/Desktop/"/>
-        <param name="method" type="string" value="test-align"/>
+        <param name="method" type="string" value="$(arg method)"/>
+        <param name="output_folder" type="string" value="$(arg output_folder)"/>
 
         <!-- map settings -->
         <param name="map_downsample_size" type="double" value="0.2"/>
