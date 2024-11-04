@@ -17,7 +17,7 @@
         <param name="map_type" type="string" value="ply"/>
 
         <!-- path settings -->
-        <param name="use_original_ts" type="int" value="0"/>
+        <param name="use_original_ts" type="int" value="1"/>
         
         <!-- Topics for odom and map to receive -->
         <!-- For Fast-lio -->
